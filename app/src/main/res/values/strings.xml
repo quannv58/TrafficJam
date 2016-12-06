@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">TrafficJam</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="search">Search location here...</string>
+    <string name="your_location">Your location</string>
+    <string name="destination">Choose your destination</string>
+</resources>
