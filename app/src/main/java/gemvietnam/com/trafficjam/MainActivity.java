@@ -12,8 +12,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +48,8 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import gemvietnam.com.trafficjam.library.AbstractRouting;
+import gemvietnam.com.trafficjam.library.GridViewAdapter;
+import gemvietnam.com.trafficjam.library.MySupportMapFragment;
 import gemvietnam.com.trafficjam.library.Route;
 import gemvietnam.com.trafficjam.library.RouteException;
 import gemvietnam.com.trafficjam.library.Routing;
@@ -64,10 +69,12 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private ProgressDialog mprogress;
     private List<Polyline> polylines;
     private static final int[] COLORS = new int[]{R.color.primary_dark,R.color.primary,R.color.primary_light,R.color.accent,R.color.primary_dark_material_light};
-
+    public static boolean mMapIsTouched = false;
 
     @BindView(R.id.activity_main_direction_cancel_img)
     ImageView mDirectionCancelImg;
+    @BindView(R.id.activity_main_gridview)
+    GridView mGridView;
     @BindView(R.id.activity_main_cancel_img)
     ImageView mCancelImg;
     @BindView(R.id.activity_main_location_search_tv)
@@ -98,12 +105,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         ButterKnife.bind(this);
 
         polylines = new ArrayList<>();
+
         /**
          * show map
          */
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        final SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
-        mapFragment.getMapAsync(this);
+        MySupportMapFragment fr = (MySupportMapFragment) mapFragment;
+        fr.getMapAsync(this);
         mDirectionImg.setVisibility(View.VISIBLE);
         mLocationSearchCv.setVisibility(View.VISIBLE);
         mDirectionSearchCv.setVisibility(View.GONE);
@@ -114,6 +123,13 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mDestinationTv.setVisibility(View.VISIBLE);
         mDestinationCancelImg.setVisibility(View.GONE);
         mSendImg.setVisibility(View.VISIBLE);
+        mGridView.setAdapter(new GridViewAdapter(this));
+        mGridView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return mapFragment.getView().dispatchTouchEvent(event);
+            }
+        });
 
         /**
          * show progress when loading map
